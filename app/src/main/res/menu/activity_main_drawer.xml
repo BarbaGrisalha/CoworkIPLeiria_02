@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_salas"
+            android:icon="@android:drawable/ic_menu_gallery"
+        android:title="Salas Disponíveis" />
+
+        <item
+            android:id="@+id/nav_minhas_reservas"
+            android:icon="@android:drawable/ic_menu_recent_history"
+            android:title="Minhas Reservas" />
+
+        <item
+            android:id="@+id/nav_faturas"
+            android:icon="@android:drawable/ic_menu_send"
+            android:title="Emitir Fatura" />
+    </group>
+
+</menu>
