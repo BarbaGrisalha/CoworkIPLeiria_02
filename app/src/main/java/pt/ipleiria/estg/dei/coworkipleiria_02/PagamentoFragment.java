@@ -95,7 +95,7 @@ public class PagamentoFragment extends Fragment {
 
             Toast.makeText(getContext(),
                     "Pagamento aprovado!\n" +
-                            "Reserva confirmada com sucesso! 🎉\n" +
+                            "Reserva confirmada com sucesso! \n" +
                             "Valor: " + String.format("%.2f €", total) +
                             "\nSalva em Minhas Reservas!",
                     Toast.LENGTH_LONG).show();
