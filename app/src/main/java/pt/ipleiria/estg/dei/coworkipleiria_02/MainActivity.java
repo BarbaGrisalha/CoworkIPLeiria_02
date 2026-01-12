@@ -3,6 +3,7 @@ package pt.ipleiria.estg.dei.coworkipleiria_02;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -78,6 +79,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             carregarFragment(new SalasFragment());
         } else if (id == R.id.nav_minhas_reservas) {
             carregarFragment(new MinhasReservasFragment());
+        } else if (id == R.id.nav_faturas) {
+            carregarFragment(new EmitirFaturasFragment());
+        } else if (id == R.id.nav_logout) {
+            // Logout: limpa a sessão
+            SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
+            prefs.edit().clear().apply();  // Remove userId, email, nome, etc.
+
+            // Mostra toast de confirmação
+            Toast.makeText(this, "Sessão encerrada. Até breve!", Toast.LENGTH_SHORT).show();
+
+            // Carrega o LoginFragment
+            carregarFragment(new LoginFragment());
+
+            // Opcional: desmarca itens do menu ou atualiza header do drawer
+            NavigationView navigationView = findViewById(R.id.nav_view);
+            navigationView.setCheckedItem(R.id.nav_salas); // ou nenhum
+
         }
         // ... outros itens
 

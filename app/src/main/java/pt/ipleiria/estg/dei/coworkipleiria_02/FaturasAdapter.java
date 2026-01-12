@@ -1,64 +1,62 @@
 package pt.ipleiria.estg.dei.coworkipleiria_02;
 
-import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link FaturasAdapter#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class FaturasAdapter extends Fragment {
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+import java.util.List;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+public class FaturasAdapter extends RecyclerView.Adapter<FaturasAdapter.ViewHolder> {
 
-    public FaturasAdapter() {
-        // Required empty public constructor
+    private List<Reserva> reservasList;
+
+    public FaturasAdapter(List<Reserva> reservasList) {
+        this.reservasList = reservasList;
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment FaturasAdapter.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static FaturasAdapter newInstance(String param1, String param2) {
-        FaturasAdapter fragment = new FaturasAdapter();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_fatura, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Reserva reserva = reservasList.get(position);
+
+        // Resumo simples: Código da reserva + Sala + Data
+        String resumo = "Reserva #" + reserva.getId() +
+                " - " + reserva.getSala().getNome() +
+                " - " + reserva.getData();
+
+        holder.tvResumo.setText(resumo);
+
+        // Botão Emitir Fatura (reutiliza o gerador que já funciona)
+        holder.btnEmitirFatura.setOnClickListener(v -> {
+            PdfFaturaGenerator.gerarFatura(holder.itemView.getContext(), reserva);
+        });
+    }
+
+    @Override
+    public int getItemCount() {
+        return reservasList.size();
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        TextView tvResumo;
+        Button btnEmitirFatura;
+
+        ViewHolder(View itemView) {
+            super(itemView);
+            tvResumo = itemView.findViewById(R.id.tvResumo);
+            btnEmitirFatura = itemView.findViewById(R.id.btnEmitirFatura);
         }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_faturas_adapter, container, false);
     }
 }
