@@ -1,7 +1,9 @@
 package pt.ipleiria.estg.dei.coworkipleiria_02;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
 import java.util.List;
@@ -9,12 +11,13 @@ import java.util.List;
 @Dao
 public interface ReservaDao {
 
-    @Insert
-    void insert(Reserva reserva);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    long insert(Reserva reserva);  // retorna o ID inserido
 
-    @Query("SELECT * FROM reservas")
-    List<Reserva> getAll();
-
-    @Query("SELECT * FROM reservas WHERE userId = :userId")
+    @Query("SELECT * FROM reservas WHERE userId = :userId ORDER BY dataReserva DESC")
     List<Reserva> getByUser(int userId);
+
+    // Opcional: se quiser deletar no futuro
+    @Delete
+    void delete(Reserva reserva);
 }

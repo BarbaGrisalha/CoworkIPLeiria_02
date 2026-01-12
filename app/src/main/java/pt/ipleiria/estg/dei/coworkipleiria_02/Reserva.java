@@ -26,9 +26,9 @@ public class Reserva implements Serializable {
 
     private double precoTotal;
 
-    private Date dataReserva;      // ← Precisa converter pra Long
+    private Date dataReserva;
 
-    private String status;         // "Confirmada", "Paga", etc.
+    private String status;
     private int userId;
 
     // Construtor vazio OBRIGATÓRIO pro Room

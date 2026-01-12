@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (savedInstanceState == null) {
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.main_content_container, new SalasFragment())
+                        .replace(R.id.main_content_container, new LoginFragment())//SalasFragment()
                         .commit();
                 navigationView.setCheckedItem(R.id.nav_salas);
             }

@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -32,6 +33,17 @@ public class LoginFragment extends Fragment {
         // Botão de login
         btnLogin.setOnClickListener(v -> realizarLogin());
 
+        // Novo: Listener para o texto de cadastro
+        TextView tvCadastrar = view.findViewById(R.id.tvCadastrar);  // Adicione isso no layout
+        tvCadastrar.setOnClickListener(v -> {
+            // Navega para CadastroFragment
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.main_content_container, new CadastroFragment())
+                    .addToBackStack(null)  // Permite voltar com back button
+                    .commit();
+        });
+
         return view;
     }
 
@@ -45,54 +57,30 @@ public class LoginFragment extends Fragment {
             return;
         }
 
-        // Bypass temporário para criar usuário teste + login automático
-        if (email.equals("admin@teste.pt") && senha.equals("123456")) {
-            AppDatabase db = AppDatabase.getDatabase(requireContext());
-            UserDao userDao = db.userDao();
+        // Login normal usando o DAO existente
+        AppDatabase db = AppDatabase.getDatabase(requireContext());
+        UserDao userDao = db.userDao();
+        User user = userDao.login(email, senha);
 
-            // Verifica se o admin já existe
-            User existing = userDao.getByEmail("admin@teste.pt");
-            if (existing == null) {
-                // Cria o usuário admin de teste
-                User admin = new User();
-                admin.nome = "Admin Teste";
-                admin.email = "admin@teste.pt";
-                admin.password = "123456";  // ← sem hash por enquanto (pra simplificar)
-                // Se tiver outros campos como id, etc., ajusta
-
-                userDao.insert(admin);
-                Toast.makeText(getContext(), "Usuário admin criado automaticamente!", Toast.LENGTH_SHORT).show();
-            }
-
-            // Agora faz o login normal com o admin
-            User user = userDao.login("admin@teste.pt", "123456");
-            if (user != null) {
-                // Salva sessão
-                SharedPreferences prefs = requireActivity().getSharedPreferences("session", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putInt("userId", user.id);
-                editor.putString("userEmail", user.email);
-                editor.putString("userNome", user.nome);
-                editor.apply();
-
-                Toast.makeText(getContext(), "Bem-vindo, " + user.nome + " (teste)!", Toast.LENGTH_SHORT).show();
-
-                // Navega pra tela principal
-                requireActivity().getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.main_content_container, new SalasFragment())
-                        .commit();
-
-                NavigationView navigationView = requireActivity().findViewById(R.id.nav_view);
-                navigationView.setCheckedItem(R.id.nav_salas);
-                return;
-            }
-        }
-
-        // Login normal (para outros usuários que vierem a existir)
-        User user = AppDatabase.getDatabase(requireContext()).userDao().login(email, senha);
         if (user != null) {
-            // ... o código de login normal que já tens
+            // Salva sessão
+            SharedPreferences prefs = requireActivity().getSharedPreferences("session", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt("userId", user.id);
+            editor.putString("userEmail", user.email);
+            editor.putString("userNome", user.nome);
+            editor.apply();
+
+            Toast.makeText(getContext(), "Bem-vindo, " + user.nome + "!", Toast.LENGTH_SHORT).show();
+
+            // Navega pra tela principal
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.main_content_container, new SalasFragment())
+                    .commit();
+
+            NavigationView navigationView = requireActivity().findViewById(R.id.nav_view);
+            navigationView.setCheckedItem(R.id.nav_salas);
         } else {
             Toast.makeText(getContext(), "Credenciais inválidas", Toast.LENGTH_SHORT).show();
         }

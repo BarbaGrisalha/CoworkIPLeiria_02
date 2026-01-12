@@ -1,5 +1,7 @@
 package pt.ipleiria.estg.dei.coworkipleiria_02;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,17 +29,28 @@ public class MinhasReservasFragment extends Fragment {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Carrega as reservas salvas
-        List<Reserva> reservas = ReservasManager.getMinhasReservas();
+        // Pega o userId da sessão
+        SharedPreferences prefs = requireActivity().getSharedPreferences("session", Context.MODE_PRIVATE);
+        int userId = prefs.getInt("userId", -1);
 
-        if (reservas.isEmpty()) {
+        if (userId == -1) {
+            tvVazio.setText("Faça login para ver suas reservas");
+            tvVazio.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+            return view;
+        }
+
+        // Consulta direta no DAO
+        AppDatabase db = AppDatabase.getDatabase(requireContext());
+        List<Reserva> reservas = db.reservaDao().getByUser(userId);
+
+        if (reservas == null || reservas.isEmpty()) {
             tvVazio.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {
             tvVazio.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
 
-            // Cria adapter simples (vamos melhorar depois)
             MinhasReservasAdapter adapter = new MinhasReservasAdapter(reservas);
             recyclerView.setAdapter(adapter);
         }

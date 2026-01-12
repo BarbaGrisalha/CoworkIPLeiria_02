@@ -1,6 +1,9 @@
 package pt.ipleiria.estg.dei.coworkipleiria_02;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +13,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+
+import java.util.Date;
 
 public class PagamentoFragment extends Fragment {
 
@@ -78,9 +83,17 @@ public class PagamentoFragment extends Fragment {
             return;
         }
 
-        if (numero.equals("4111111111111111")) {
-            // Cria a reserva com todos os dados
-            int duracaoHoras = Integer.parseInt(horaFim.split(":")[0]) - Integer.parseInt(horaInicio.split(":")[0]);
+        if (numero.equals("4111111111111111")) {  // cartão de teste
+            // Calcula duração (você já tinha isso)
+            int duracaoHoras;
+            try {
+                duracaoHoras = Integer.parseInt(horaFim.split(":")[0]) - Integer.parseInt(horaInicio.split(":")[0]);
+            } catch (Exception e) {
+                Toast.makeText(getContext(), "Erro ao calcular duração", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Cria a reserva
             Reserva novaReserva = new Reserva(
                     sala,
                     data,
@@ -90,18 +103,45 @@ public class PagamentoFragment extends Fragment {
                     total
             );
 
-            // Salva a reserva
-            ReservasManager.adicionarReserva(novaReserva);
+            // Define campos obrigatórios para persistência
+            novaReserva.setDataReserva(new Date());  // data/hora atual da reserva
+            novaReserva.setStatus("Paga");           // ou "Confirmada", conforme preferir
 
-            Toast.makeText(getContext(),
-                    "Pagamento aprovado!\n" +
-                            "Reserva confirmada com sucesso! \n" +
-                            "Valor: " + String.format("%.2f €", total) +
-                            "\nSalva em Minhas Reservas!",
-                    Toast.LENGTH_LONG).show();
+            // Pega o userId da sessão atual
+            SharedPreferences prefs = requireActivity().getSharedPreferences("session", Context.MODE_PRIVATE);
+            int userId = prefs.getInt("userId", -1);
 
-            // Volta para o fragment anterior (Reserva ou lista)
-            requireActivity().getSupportFragmentManager().popBackStack();
+            if (userId == -1) {
+                Toast.makeText(getContext(), "Erro: Nenhum usuário logado. Faça login novamente.", Toast.LENGTH_LONG).show();
+                // Opcional: redireciona para login
+                requireActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.main_content_container, new LoginFragment())
+                        .commit();
+                return;
+            }
+
+            novaReserva.setUserId(userId);
+
+            // Salva diretamente no Room DAO
+            try {
+                AppDatabase db = AppDatabase.getDatabase(requireContext());
+                db.reservaDao().insert(novaReserva);
+
+                Toast.makeText(getContext(),
+                        "Pagamento aprovado!\n" +
+                                "Reserva confirmada com sucesso!\n" +
+                                "Valor: " + String.format("%.2f €", total) +
+                                "\nSalva em Minhas Reservas!",
+                        Toast.LENGTH_LONG).show();
+
+                // Volta para o fragment anterior
+                requireActivity().getSupportFragmentManager().popBackStack();
+
+            } catch (Exception e) {
+                Toast.makeText(getContext(), "Erro ao salvar a reserva no banco: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Log.e("PagamentoFragment", "Erro ao inserir reserva", e);
+            }
 
         } else {
             Toast.makeText(getContext(), "Cartão inválido. Use o teste: 4111 1111 1111 1111", Toast.LENGTH_LONG).show();
