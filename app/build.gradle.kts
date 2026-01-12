@@ -51,7 +51,8 @@ dependencies {
 
     // Opcional: suporte moderno (LiveData/Flow) - pode remover se não usar
     implementation("androidx.room:room-ktx:2.6.1")
-
+    implementation("com.google.code.gson:gson:2.11.0")
+// Versão atual, sync depois!
     // Testes
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
