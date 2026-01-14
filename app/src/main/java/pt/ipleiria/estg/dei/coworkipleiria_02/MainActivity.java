@@ -2,7 +2,10 @@ package pt.ipleiria.estg.dei.coworkipleiria_02;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -44,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (savedInstanceState == null) {
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.main_content_container, new LoginFragment())//SalasFragment()
+                        .replace(R.id.main_content_container, new SalasFragment())
                         .commit();
                 navigationView.setCheckedItem(R.id.nav_salas);
             }
@@ -55,8 +58,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .replace(R.id.main_content_container, new LoginFragment())
                     .commit();
         }
+        atualizarHeaderUsuario();
     }
 
+//    @Override
+//    protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        Log.d("MainActivity", "onCreate started");
+//        setContentView(R.layout.activity_main);
+//        Log.d("MainActivity", "setContentView done");
+//        // ... resto
+//        if (!isUserLoggedIn()) {
+//            Log.d("MainActivity", "Loading LoginFragment");
+//            getSupportFragmentManager().beginTransaction().replace(R.id.main_content_container, new LoginFragment()).commit();
+//            Log.d("MainActivity", "Fragment committed");
+//        }
+//    }
     // Verifica se tem userId salvo (sessão ativa)
     private boolean isUserLoggedIn() {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
@@ -122,6 +139,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
+        }
+    }
+
+    public void atualizarHeaderUsuario() {
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        View headerView = navigationView.getHeaderView(0);
+
+        TextView tvNome = headerView.findViewById(R.id.tv_header_nome);
+        TextView tvEmail = headerView.findViewById(R.id.tv_header_email);
+
+        SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
+        int userId = prefs.getInt("userId", -1);
+
+        if (userId != -1) {
+            // Carrega o utilizador do BD
+            UserDao userDao = AppDatabase.getDatabase(this).userDao();
+            User user = userDao.getUserById(userId);  // tens este método no DAO?
+
+            if (user != null) {
+                tvNome.setText(user.getNome());
+                tvEmail.setText(user.getEmail());
+            } else {
+                tvNome.setText("Utilizador não encontrado");
+                tvEmail.setText("");
+            }
+        } else {
+            tvNome.setText("Não logado");
+            tvEmail.setText("");
         }
     }
 }

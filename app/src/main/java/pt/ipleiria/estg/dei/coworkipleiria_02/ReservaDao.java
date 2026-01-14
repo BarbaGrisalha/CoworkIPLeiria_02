@@ -5,6 +5,8 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Update;
+
 
 import java.util.List;
 
@@ -20,4 +22,8 @@ public interface ReservaDao {
     // Opcional: se quiser deletar no futuro
     @Delete
     void delete(Reserva reserva);
+
+    @Update
+    void update(Reserva reserva);
+
 }

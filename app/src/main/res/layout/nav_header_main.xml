@@ -8,16 +8,18 @@
     android:padding="16dp"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-<TextView
-android:layout_width="match_parent"
-android:layout_height="wrap_content"
-android:text="Altamir"
-android:textSize="20sp"
-android:textStyle="bold" />
+    <TextView
+        android:id="@+id/tv_header_nome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
-<TextView
-android:layout_width="match_parent"
-android:layout_height="wrap_content"
-android:text="altamir@exemplo.com" />
+    <TextView
+        android:id="@+id/tv_header_email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="" />
 
-    </LinearLayout>
+</LinearLayout>

@@ -76,7 +76,7 @@ public class PdfFaturaGenerator {
         // Detalhes reserva
         canvas.drawText("Descrição:", leftMargin, y, paint);
         y += 20;
-        canvas.drawText("Sala: " + reserva.getSala().getNome() + " (" + reserva.getSala().getTipo().name().replace("_", " ") + ")", leftMargin, y, paint);
+        canvas.drawText("Sala_old: " + reserva.getSala().getNome() + " (" + reserva.getSala().getTipo().name().replace("_", " ") + ")", leftMargin, y, paint);
         y += 20;
         canvas.drawText("Data: " + reserva.getData(), leftMargin, y, paint);
         y += 20;

@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import pt.ipleiria.estg.dei.coworkipleiria_02.R;
-import pt.ipleiria.estg.dei.coworkipleiria_02.Sala;
+import pt.ipleiria.estg.dei.coworkipleiria_02.model.Sala;
 
 public class SalasAdapter extends RecyclerView.Adapter<SalasAdapter.SalaViewHolder> {
 

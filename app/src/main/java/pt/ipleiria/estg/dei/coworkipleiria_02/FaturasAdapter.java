@@ -31,7 +31,7 @@ public class FaturasAdapter extends RecyclerView.Adapter<FaturasAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Reserva reserva = reservasList.get(position);
 
-        // Resumo simples: Código da reserva + Sala + Data
+        // Resumo simples: Código da reserva + Sala_old + Data
         String resumo = "Reserva #" + reserva.getId() +
                 " - " + reserva.getSala().getNome() +
                 " - " + reserva.getData();

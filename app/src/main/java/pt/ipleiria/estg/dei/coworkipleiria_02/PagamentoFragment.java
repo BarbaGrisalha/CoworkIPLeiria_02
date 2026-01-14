@@ -16,6 +16,8 @@ import androidx.fragment.app.Fragment;
 
 import java.util.Date;
 
+import pt.ipleiria.estg.dei.coworkipleiria_02.model.Sala;
+
 public class PagamentoFragment extends Fragment {
 
     private static final String ARG_TOTAL = "total";

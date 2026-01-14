@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pt.ipleiria.estg.dei.coworkipleiria_02.adapter.SalasAdapter;
-import pt.ipleiria.estg.dei.coworkipleiria_02.Sala;
+import pt.ipleiria.estg.dei.coworkipleiria_02.model.Sala;
 
 public class SalasFragment extends Fragment {
 
@@ -52,16 +52,16 @@ public class SalasFragment extends Fragment {
     private List<Sala> criarListaSalasExemplo() {
         List<Sala> lista = new ArrayList<>();
 
-        lista.add(new Sala("1", "Sala 1 - Individual", 1, Sala.TipoSala.INDIVIDUAL, true, 7.0));
-        lista.add(new Sala("2", "Sala 2 - Individual", 1, Sala.TipoSala.INDIVIDUAL, true, 7.0));
-        lista.add(new Sala("3", "Sala 3 - Equipe Pequena", 4, Sala.TipoSala.EQUIPE_PEQUENA, true, 12.0));
-        lista.add(new Sala("4", "Sala 4 - Equipe Pequena", 4, Sala.TipoSala.EQUIPE_PEQUENA, true, 12.0));
-        lista.add(new Sala("5", "Sala 5 - Equipe Média", 8, Sala.TipoSala.EQUIPE_MEDIA, true, 18.0));
-        lista.add(new Sala("6", "Sala 6 - Equipe Média", 8, Sala.TipoSala.EQUIPE_MEDIA, true, 18.0));
-        lista.add(new Sala("7", "Sala 7 - Equipe Grande", 12, Sala.TipoSala.EQUIPE_MEDIA, true, 25.0));
-        lista.add(new Sala("8", "Sala 8 - Equipe Grande", 12, Sala.TipoSala.EQUIPE_MEDIA, true, 25.0));
-        lista.add(new Sala("9", "Sala 9 - Coworking Aberto", 20, Sala.TipoSala.EQUIPE_MEDIA, true, null));
-        lista.add(new Sala("10", "Sala de Reuniões", 12, Sala.TipoSala.REUNIAO, true, 35.0));
+        lista.add(new Sala("1", "Sala_old 1 - Individual", 1, Sala.TipoSala.INDIVIDUAL, true, 7.0,true));
+        lista.add(new Sala("2", "Sala_old 2 - Individual", 1, Sala.TipoSala.INDIVIDUAL, true, 7.0,true));
+        lista.add(new Sala("3", "Sala_old 3 - Equipe Pequena", 4, Sala.TipoSala.EQUIPE_PEQUENA, true, 12.0,true));
+        lista.add(new Sala("4", "Sala_old 4 - Equipe Pequena", 4, Sala.TipoSala.EQUIPE_PEQUENA, true, 12.0,true));
+        lista.add(new Sala("5", "Sala_old 5 - Equipe Média", 8, Sala.TipoSala.EQUIPE_MEDIA, true, 18.0,true));
+        lista.add(new Sala("6", "Sala_old 6 - Equipe Média", 8, Sala.TipoSala.EQUIPE_MEDIA, true, 18.0,true));
+        lista.add(new Sala("7", "Sala_old 7 - Equipe Grande", 12, Sala.TipoSala.EQUIPE_MEDIA, true, 25.0,true));
+        lista.add(new Sala("8", "Sala_old 8 - Equipe Grande", 12, Sala.TipoSala.EQUIPE_MEDIA, true, 25.0,true));
+        lista.add(new Sala("9", "Sala_old 9 - Coworking Aberto", 20, Sala.TipoSala.EQUIPE_MEDIA, true, null,true));
+        lista.add(new Sala("10", "Sala_old de Reuniões", 12, Sala.TipoSala.REUNIAO, true, 35.0,true));
 
         return lista;
     }

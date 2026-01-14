@@ -1,6 +1,7 @@
 package pt.ipleiria.estg.dei.coworkipleiria_02;
 
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import androidx.room.ColumnInfo;
 
@@ -23,6 +24,7 @@ public class User {
     public long dataRegisto;  // timestamp de criação
 
     // Construtor vazio obrigatório para Room
+    @Ignore
     public User() {}
 
     // Construtor útil
