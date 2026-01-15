@@ -10,7 +10,7 @@ import android.content.Context;
 
 import pt.ipleiria.estg.dei.coworkipleiria_02.model.Sala;
 
-@Database(entities = {User.class, Reserva.class, Sala.class}, version = 3, exportSchema = false)
+@Database(entities = {User.class, Reserva.class, Sala.class}, version = 4, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract UserDao userDao();
@@ -26,20 +26,19 @@ public abstract class AppDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                                     AppDatabase.class, "cowork_database")
-                            .addMigrations(MIGRATION_2_3)   // ← adiciona esta linha
-                            .allowMainThreadQueries()       // Temporário para testes
+                            .addMigrations(MIGRATION_3_4)
+                            .allowMainThreadQueries()
                             .build();
                 }
             }
         }
         return INSTANCE;
     }
-    // Coloca esta migration como campo estático (fora do método, dentro da classe)
-// ... dentro da classe AppDatabase
-    static final Migration MIGRATION_2_3 = new Migration(2, 3) {
+
+    static final Migration MIGRATION_3_4 = new Migration(3, 4) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
-            // Cria a tabela salas (se não existir)
+            // Cria a tabela salas
             database.execSQL("CREATE TABLE IF NOT EXISTS salas (" +
                     "id TEXT PRIMARY KEY NOT NULL, " +
                     "nome TEXT NOT NULL, " +

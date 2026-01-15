@@ -10,21 +10,24 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class EditarReservaFragment extends Fragment {
 
     private static final String ARG_RESERVA = "reserva";
 
-    private Reserva reserva;
-    private TextView tvSalaNome;
+    private Reserva reservaAtual;
     private DatePicker datePicker;
-    private TimePicker timePickerInicio;
-    private TimePicker timePickerFim;
+    private TimePicker timePickerInicio, timePickerFim;
+    private TextView tvPrecoTotal;
     private Button btnSalvar;
-    private Button btnCancelar;
 
     public static EditarReservaFragment newInstance(Reserva reserva) {
         EditarReservaFragment fragment = new EditarReservaFragment();
@@ -35,135 +38,99 @@ public class EditarReservaFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_editar_reserva, container, false);
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            reservaAtual = (Reserva) getArguments().getSerializable(ARG_RESERVA);
+        }
+    }
 
-        // Inicializa as views
-        tvSalaNome = view.findViewById(R.id.tvSalaNome);
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_reserva, container, false);
+
         datePicker = view.findViewById(R.id.datePicker);
         timePickerInicio = view.findViewById(R.id.timePickerInicio);
         timePickerFim = view.findViewById(R.id.timePickerFim);
-        btnSalvar = view.findViewById(R.id.btnSalvar);
-        btnCancelar = view.findViewById(R.id.btnCancelar);
+        tvPrecoTotal = view.findViewById(R.id.tvPrecoTotal);
+        btnSalvar = view.findViewById(R.id.btnVerificarDisponibilidade);
 
-        // Carrega os dados da reserva atual
-        if (getArguments() != null) {
-            reserva = (Reserva) getArguments().getSerializable(ARG_RESERVA);
-            if (reserva != null) {
-                if (reserva.getSala() != null) {
-                    tvSalaNome.setText(reserva.getSala().getNome());
-                } else {
-                    tvSalaNome.setText("Sala_old não identificada");
-                }
+        // Muda título e botão
+        ((TextView) view.findViewById(R.id.tvTituloSala)).setText("Editar Reserva");
+        btnSalvar.setText("Salvar Alterações");
 
-                // Preenche a data no DatePicker
-                String[] partesData = reserva.getData().split("/");
-                if (partesData.length == 3) {
-                    try {
-                        int dia = Integer.parseInt(partesData[0]);
-                        int mes = Integer.parseInt(partesData[1]) - 1; // Janeiro = 0
-                        int ano = Integer.parseInt(partesData[2]);
-                        datePicker.updateDate(ano, mes, dia);
-                    } catch (Exception e) {
-                        Toast.makeText(getContext(), "Erro ao carregar data", Toast.LENGTH_SHORT).show();
-                    }
-                }
+        // Preenche com dados atuais
+        preencherCampos();
 
-                // Preenche horários (formato HH:00)
-                try {
-                    String[] inicio = reserva.getHoraInicio().split(":");
-                    timePickerInicio.setHour(Integer.parseInt(inicio[0]));
-                    timePickerInicio.setMinute(0);
-
-                    String[] fim = reserva.getHoraFim().split(":");
-                    timePickerFim.setHour(Integer.parseInt(fim[0]));
-                    timePickerFim.setMinute(0);
-                } catch (Exception e) {
-                    Toast.makeText(getContext(), "Erro ao carregar horários", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
-
-        // Configura formato 24h
-        timePickerInicio.setIs24HourView(true);
-        timePickerFim.setIs24HourView(true);
-
-        // Listeners dos botões
-        btnSalvar.setOnClickListener(v -> tentarSalvarAlteracao());
-        btnCancelar.setOnClickListener(v -> {
-            if (getParentFragmentManager() != null) {
-                getParentFragmentManager().popBackStack();
-            }
-        });
+        // Listener do botão Salvar
+        btnSalvar.setOnClickListener(v -> salvarAlteracoes());
 
         return view;
     }
 
-    private void tentarSalvarAlteracao() {
-        if (reserva == null) {
-            Toast.makeText(getContext(), "Nenhuma reserva carregada", Toast.LENGTH_SHORT).show();
-            return;
+    private void preencherCampos() {
+        String[] dataParts = reservaAtual.getData().split("/");
+        if (dataParts.length == 3) {
+            int day = Integer.parseInt(dataParts[0]);
+            int month = Integer.parseInt(dataParts[1]) - 1;
+            int year = Integer.parseInt(dataParts[2]);
+            datePicker.updateDate(year, month, day);
         }
 
-        // Lê os novos valores
-        int dia = datePicker.getDayOfMonth();
-        int mes = datePicker.getMonth() + 1;
-        int ano = datePicker.getYear();
-        String novaData = String.format("%02d/%02d/%d", dia, mes, ano);
+        // Horas (formato "HH:mm")
+        String[] inicioParts = reservaAtual.getHoraInicio().split(":");
+        timePickerInicio.setHour(Integer.parseInt(inicioParts[0]));
+        timePickerInicio.setMinute(Integer.parseInt(inicioParts[1]));
+
+        String[] fimParts = reservaAtual.getHoraFim().split(":");
+        timePickerFim.setHour(Integer.parseInt(fimParts[0]));
+        timePickerFim.setMinute(Integer.parseInt(fimParts[1]));
+
+        // Preço total
+        tvPrecoTotal.setText("Preço total: " + String.format("%.2f €", reservaAtual.getPrecoTotal()));
+    }
+
+    private void salvarAlteracoes() {
+        // Pega nova data/hora
+        int day = datePicker.getDayOfMonth();
+        int month = datePicker.getMonth() + 1;
+        int year = datePicker.getYear();
+        String novaData = String.format("%02d/%02d/%d", day, month, year);
 
         int horaInicio = timePickerInicio.getHour();
+        int minInicio = timePickerInicio.getMinute();
+        String novaHoraInicio = String.format("%02d:%02d", horaInicio, minInicio);
+
         int horaFim = timePickerFim.getHour();
+        int minFim = timePickerFim.getMinute();
+        String novaHoraFim = String.format("%02d:%02d", horaFim, minFim);
 
-        // Validações básicas
-        if (horaFim <= horaInicio) {
-            Toast.makeText(getContext(), "A hora de fim deve ser posterior à de início", Toast.LENGTH_LONG).show();
+        // Validação: data/hora no futuro
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+            Date novaDataHora = sdf.parse(novaData + " " + novaHoraInicio);
+            if (novaDataHora.before(new Date())) {
+                Toast.makeText(requireContext(), "Não pode alterar para data/hora no passado", Toast.LENGTH_LONG).show();
+                return;
+            }
+        } catch (Exception e) {
+            Toast.makeText(requireContext(), "Erro ao validar data", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (horaInicio < 9 || horaFim > 19) {
-            Toast.makeText(getContext(), "Horário deve estar entre 09:00 e 19:00", Toast.LENGTH_LONG).show();
-            return;
-        }
+        // Atualiza a reserva
+        reservaAtual.setData(novaData);
+        reservaAtual.setHoraInicio(novaHoraInicio);
+        reservaAtual.setHoraFim(novaHoraFim);
 
-        String novoInicio = String.format("%02d:00", horaInicio);
-        String novoFim = String.format("%02d:00", horaFim);
-
-        // Verifica conflitos (ignorando a própria reserva)
+        // Aqui guarda na base de dados - lembrar disso.
         AppDatabase db = AppDatabase.getDatabase(requireContext());
-//        List<Reserva> conflitos = db.reservaDao().findConflitos(
-//                reserva.getSalaId(),
-//                novaData,
-//                novoInicio,
-//                novoFim,
-//                reserva.getId()
-//        );
-//
-//        if (!conflitos.isEmpty()) {
-//            Toast.makeText(getContext(), "Horário já ocupado por outra reserva!", Toast.LENGTH_LONG).show();
-//            return;
-//        }
+        db.reservaDao().update(reservaAtual);
 
-        // Atualiza os campos da reserva
-        reserva.setData(novaData);
-        reserva.setHoraInicio(novoInicio);
-        reserva.setHoraFim(novoFim);
+        Toast.makeText(requireContext(), "Reserva atualizada com sucesso", Toast.LENGTH_SHORT).show();
 
-        int duracao = horaFim - horaInicio;
-        reserva.setDuracaoHoras(duracao);
-
-        Double precoHora = (reserva.getSala() != null) ? reserva.getSala().getPrecoPorHora() : null;
-        double precoTotal = (precoHora != null && precoHora > 0) ? duracao * precoHora : 0.0;
-        reserva.setPrecoTotal(precoTotal);
-
-        // Salva no banco
-        db.reservaDao().update(reserva);
-
-        Toast.makeText(getContext(), "Reserva atualizada com sucesso!", Toast.LENGTH_SHORT).show();
-
-        // Volta para a tela anterior
-        if (getParentFragmentManager() != null) {
-            getParentFragmentManager().popBackStack();
-        }
+        // Volta para lista
+        requireActivity().getSupportFragmentManager().popBackStack();
     }
 }

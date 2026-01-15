@@ -51,12 +51,12 @@ public class EmitirFaturasFragment extends Fragment {
             tvVazio.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
 
-            // Usa o adapter novo e simples
+            // Usa o adapter novo
             FaturasAdapter adapter = new FaturasAdapter(reservas);
             recyclerView.setAdapter(adapter);
         }
 
-        // Opcional: muda título da tela
+
         requireActivity().setTitle("Emitir Fatura");
 
         return view;

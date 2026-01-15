@@ -59,7 +59,7 @@ public class CadastroFragment extends Fragment {
 
         Toast.makeText(getContext(), "Cadastro realizado com sucesso! Faça login.", Toast.LENGTH_SHORT).show();
 
-        // Volta para LoginFragment
+        // Volta pra LoginFragment
         requireActivity().getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.main_content_container, new LoginFragment())

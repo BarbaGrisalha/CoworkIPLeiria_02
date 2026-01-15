@@ -14,14 +14,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class MinhasReservasFragment extends Fragment {
+public class MinhasReservasFragment extends Fragment implements MinhasReservasAdapter.OnReservaEditarListener  {
 
     private RecyclerView recyclerView;
     private TextView tvVazio;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_minhas_reservas, container, false);
 
         recyclerView = view.findViewById(R.id.recyclerMinhasReservas);
@@ -29,7 +28,6 @@ public class MinhasReservasFragment extends Fragment {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Pega o userId da sessão
         SharedPreferences prefs = requireActivity().getSharedPreferences("session", Context.MODE_PRIVATE);
         int userId = prefs.getInt("userId", -1);
 
@@ -40,7 +38,6 @@ public class MinhasReservasFragment extends Fragment {
             return view;
         }
 
-        // Consulta direta no DAO
         AppDatabase db = AppDatabase.getDatabase(requireContext());
         List<Reserva> reservas = db.reservaDao().getByUser(userId);
 
@@ -51,10 +48,20 @@ public class MinhasReservasFragment extends Fragment {
             tvVazio.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
 
-            MinhasReservasAdapter adapter = new MinhasReservasAdapter(reservas);
+            MinhasReservasAdapter adapter = new MinhasReservasAdapter(requireContext(), reservas, this);
             recyclerView.setAdapter(adapter);
         }
 
         return view;
+    }
+    @Override
+    public void onEditarReserva(Reserva reserva) {
+        EditarReservaFragment editarFragment = EditarReservaFragment.newInstance(reserva);
+
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.main_content_container, editarFragment)
+                .addToBackStack(null)
+                .commit();
     }
 }

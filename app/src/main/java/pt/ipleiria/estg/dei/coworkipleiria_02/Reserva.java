@@ -13,7 +13,7 @@ import pt.ipleiria.estg.dei.coworkipleiria_02.model.Sala;
 
 
 @Entity(tableName = "reservas")
-@TypeConverters(Converters.class)  // Se já tens Converters, mantém
+@TypeConverters(Converters.class)
 public class Reserva implements Serializable {
 
     @PrimaryKey(autoGenerate = true)
@@ -21,7 +21,7 @@ public class Reserva implements Serializable {
 
     private Sala sala;
 
-    private String data;           // ex: "12/01/2026" – String ok, não precisa converter
+    private String data;
 
     private String horaInicio;
 
@@ -37,7 +37,7 @@ public class Reserva implements Serializable {
     private int userId;
     private String salaId;
 
-    // Construtor vazio OBRIGATÓRIO pro Room
+
     public Reserva() {}
 
     public String getSalaId() {
@@ -48,7 +48,7 @@ public class Reserva implements Serializable {
         this.salaId = salaId;
     }
 
-    // Novo: Construtor conveniente com os parâmetros que tu usa no PagamentoFragment
+
     @Ignore
     public Reserva(Sala sala,String data, String horaInicio, String horaFim,
                    int duracaoHoras, double precoTotal) {
@@ -58,18 +58,16 @@ public class Reserva implements Serializable {
         this.horaFim = horaFim;
         this.duracaoHoras = duracaoHoras;
         this.precoTotal = precoTotal;
-
-        // Valores defaults pros outros campos (opcional, mas bom)
-        this.dataReserva = new Date();          // data/hora atual da reserva
-        this.status = "Pendente";               // ou "Confirmada" se já pagou
-        this.userId = 0;                        // Vai setar depois com o user logado
+        this.dataReserva = new Date();
+        this.status = "Pendente";
+        this.userId = 0;
         this.salaId = sala.getId();
     }
 
     public int getUserId() {
         return userId;
     }
-    // GETTERS e SETTERS para TODOS os campos (públicos!)
+
     public long getId() {
         return id;
     }

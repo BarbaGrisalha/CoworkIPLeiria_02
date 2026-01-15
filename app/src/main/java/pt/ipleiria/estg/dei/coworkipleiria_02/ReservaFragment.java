@@ -22,22 +22,21 @@ public class ReservaFragment extends Fragment {
 
     private static final String ARG_SALA = "sala";
 
-    private Sala sala;  // ← agora declarado aqui
+    private Sala sala;
     private TextView tvTituloSala, tvDetalhesSala, tvPrecoTotal;
     private DatePicker datePicker;
     private TimePicker timePickerInicio, timePickerFim;
     private Button btnVerificarDisponibilidade;
 
-    //Lista fake de horários ocupados da sala 1 e 2 sºo pra testarmos
+    //Lista fake de horários ocupados da sala 1 e 2 sºo pra testar o bloqueio.
 
     private static final List<ReservaFake> reservasOcupadas = new ArrayList<>();
 
     static {
-        reservasOcupadas.add(new ReservaFake("1", 2026, 1, 12, 10, 0, 12, 0)); // sala 1 ocupada 10h-12h dia 12/01
-        reservasOcupadas.add(new ReservaFake("2", 2026, 1, 13, 14, 0, 16, 0)); // sala 2 ocupada 14h-16h dia 13/01
+        reservasOcupadas.add(new ReservaFake("1", 2026, 1, 12, 10, 0, 12, 0));
+        reservasOcupadas.add(new ReservaFake("2", 2026, 1, 13, 14, 0, 16, 0));
     }
 
-    //Classe interna simples para poder simular a reserva.
     private static class ReservaFake {
         String salaId;
         int ano, mes, dia, horaInicio, minInicio, horaFim, minFim;
@@ -75,7 +74,7 @@ public class ReservaFragment extends Fragment {
         timePickerFim = view.findViewById(R.id.timePickerFim);
         btnVerificarDisponibilidade = view.findViewById(R.id.btnVerificarDisponibilidade);
 
-        // Carrega a sala
+
         if (getArguments() != null) {
             sala = (Sala) getArguments().getSerializable(ARG_SALA);
             if (sala != null) {
@@ -95,7 +94,7 @@ public class ReservaFragment extends Fragment {
         timePickerInicio.setIs24HourView(true);
         timePickerFim.setIs24HourView(true);
 
-        // Atualiza preço quando mudar qualquer hora
+
         timePickerInicio.setOnTimeChangedListener((picker, hourOfDay, minute) -> atualizarPrecoTotal());
         timePickerFim.setOnTimeChangedListener((picker, hourOfDay, minute) -> atualizarPrecoTotal());
 
@@ -126,7 +125,7 @@ public class ReservaFragment extends Fragment {
 
     private void verificarEDisponibilidade() {
         int dia = datePicker.getDayOfMonth();
-        int mes = datePicker.getMonth() + 1; // Janeiro = 0 → +1
+        int mes = datePicker.getMonth() + 1; // Janeiro = 0 por isso +1
         int ano = datePicker.getYear();
 
         int horaInicio = timePickerInicio.getHour();
@@ -135,7 +134,7 @@ public class ReservaFragment extends Fragment {
         int horaFim = timePickerFim.getHour();
         int minutoFim = timePickerFim.getMinute();
 
-        // 1. Validação: Dentro do horário de funcionamento (09:00–19:00)
+
         if (horaInicio < 9 || horaFim > 19 ||
                 (horaInicio == 19 && minutoInicio > 0) ||
                 (horaFim == 19 && minutoFim > 0)) {
@@ -143,25 +142,24 @@ public class ReservaFragment extends Fragment {
             return;
         }
 
-        // 2. Apenas horas fechadas (sem minutos)
+
         if (minutoInicio != 0 || minutoFim != 0) {
             Toast.makeText(getContext(), "Apenas horários fechados (ex: 10:00, 11:00)", Toast.LENGTH_LONG).show();
             return;
         }
 
-        // 3. Hora fim > hora início + duração mínima 1h
+
         int duracaoHoras = horaFim - horaInicio;
         if (duracaoHoras < 1) {
             Toast.makeText(getContext(), "Duração mínima: 1 hora", Toast.LENGTH_LONG).show();
             return;
         }
 
-        // 4. Simulação: Verificar se o horário está ocupado (lista fake)
+        // Verificar  horário  ocupado da lista fake
         boolean ocupado = false;
         for (ReservaFake reserva : reservasOcupadas) {
             if (reserva.salaId.equals(sala.getId()) &&
                     reserva.ano == ano && reserva.mes == mes && reserva.dia == dia) {
-                // Sobreposição simples
                 if (horaInicio < reserva.horaFim && horaFim > reserva.horaInicio) {
                     ocupado = true;
                     break;
@@ -174,25 +172,25 @@ public class ReservaFragment extends Fragment {
             return;
         }
 
-        // 5. Sucesso total!
+
         double precoTotal = duracaoHoras * (sala.getPrecoPorHora() != null ? sala.getPrecoPorHora() : 0.0);
 
-        // Feedback rápido para o utilizador
+
         Toast.makeText(getContext(), "Horário disponível! A redirecionar para pagamento...", Toast.LENGTH_SHORT).show();
 
-        // Abre o fragment de pagamento
+        //chama pagamento
         PagamentoFragment pagamentoFragment = PagamentoFragment.newInstance(
                 precoTotal,
-                String.format("%02d/%02d/%d", dia, mes, ano),  // ex: 12/01/2026
-                String.format("%02d:00", horaInicio),          // ex: 10:00
+                String.format("%02d/%02d/%d", dia, mes, ano),
+                String.format("%02d:00", horaInicio),
                 String.format("%02d:00", horaFim),
                 sala// ex: 12:00
         );
 
         requireActivity().getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.main_content_container, pagamentoFragment)  // usa o ID correto do teu container
-                .addToBackStack(null)  // permite voltar com botão back
+                .replace(R.id.main_content_container, pagamentoFragment)
+                .addToBackStack(null)
                 .commit();
     }
 }

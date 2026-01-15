@@ -62,7 +62,7 @@ public class PagamentoFragment extends Fragment {
             data = getArguments().getString(ARG_DATA, "");
             horaInicio = getArguments().getString(ARG_HORA_INICIO, "");
             horaFim = getArguments().getString(ARG_HORA_FIM, "");
-            sala = (Sala) getArguments().getSerializable(ARG_SALA);  // ← recupera aqui
+            sala = (Sala) getArguments().getSerializable(ARG_SALA);
 
             tvDetalhes.setText("Reserva para " + data + "\n" +
                     "Horário: " + horaInicio + " às " + horaFim + "\n" +
@@ -85,8 +85,8 @@ public class PagamentoFragment extends Fragment {
             return;
         }
 
-        if (numero.equals("4111111111111111")) {  // cartão de teste
-            // Calcula duração (você já tinha isso)
+        if (numero.equals("4111111111111111")) {  // cartão VisaFake
+
             int duracaoHoras;
             try {
                 duracaoHoras = Integer.parseInt(horaFim.split(":")[0]) - Integer.parseInt(horaInicio.split(":")[0]);
@@ -105,9 +105,9 @@ public class PagamentoFragment extends Fragment {
                     total
             );
 
-            // Define campos obrigatórios para persistência
-            novaReserva.setDataReserva(new Date());  // data/hora atual da reserva
-            novaReserva.setStatus("Paga");           // ou "Confirmada", conforme preferir
+
+            novaReserva.setDataReserva(new Date());
+            novaReserva.setStatus("Paga");
 
             // Pega o userId da sessão atual
             SharedPreferences prefs = requireActivity().getSharedPreferences("session", Context.MODE_PRIVATE);
@@ -115,7 +115,7 @@ public class PagamentoFragment extends Fragment {
 
             if (userId == -1) {
                 Toast.makeText(getContext(), "Erro: Nenhum usuário logado. Faça login novamente.", Toast.LENGTH_LONG).show();
-                // Opcional: redireciona para login
+
                 requireActivity().getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.main_content_container, new LoginFragment())
@@ -125,7 +125,7 @@ public class PagamentoFragment extends Fragment {
 
             novaReserva.setUserId(userId);
 
-            // Salva diretamente no Room DAO
+
             try {
                 AppDatabase db = AppDatabase.getDatabase(requireContext());
                 db.reservaDao().insert(novaReserva);
@@ -137,7 +137,7 @@ public class PagamentoFragment extends Fragment {
                                 "\nSalva em Minhas Reservas!",
                         Toast.LENGTH_LONG).show();
 
-                // Volta para o fragment anterior
+
                 requireActivity().getSupportFragmentManager().popBackStack();
 
             } catch (Exception e) {

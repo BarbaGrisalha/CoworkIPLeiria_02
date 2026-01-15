@@ -14,20 +14,20 @@ public class User {
     @ColumnInfo(name = "email")
     public String email;
 
-    @ColumnInfo(name = "password")  // NUNCA guardes senha em plain text! (vamos usar hash depois)
+    @ColumnInfo(name = "password")
     public String password;
 
     @ColumnInfo(name = "nome")
-    public String nome;  // opcional, para mostrar "Bem-vindo, João"
+    public String nome;
 
     @ColumnInfo(name = "data_registo")
-    public long dataRegisto;  // timestamp de criação
+    public long dataRegisto;
 
-    // Construtor vazio obrigatório para Room
+
     @Ignore
     public User() {}
 
-    // Construtor útil
+
     public User(String email, String password, String nome) {
         this.email = email;
         this.password = password;
@@ -35,7 +35,7 @@ public class User {
         this.dataRegisto = System.currentTimeMillis();
     }
 
-    // Getters e Setters (Room precisa deles)
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

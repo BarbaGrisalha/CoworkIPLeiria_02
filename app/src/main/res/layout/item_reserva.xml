@@ -6,27 +6,30 @@
     android:padding="16dp"
     android:background="?android:attr/selectableItemBackground">
 
-    <TextView
-        android:id="@+id/tvResumo"
+    <TextView android:id="@+id/tvResumo" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="16sp" android:textStyle="bold" />
+    <TextView android:id="@+id/tvDetalhes" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="14sp" android:layout_marginTop="4dp" />
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="8dp">
 
-    <TextView
-        android:id="@+id/tvDetalhes"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:layout_marginTop="4dp" />
+        <Button
+            android:id="@+id/btnEditar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Editar"
+            android:textSize="14sp"
+            android:backgroundTint="#2196F3" />
 
-    <Button
-        android:id="@+id/btnEmitirFatura"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginTop="8dp"
-        android:text="Emitir Fatura"
-        android:textSize="14sp" />
-
+        <Button
+            android:id="@+id/btnEmitirFatura"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Emitir Fatura"
+            android:textSize="14sp" />
+    </LinearLayout>
 </LinearLayout>

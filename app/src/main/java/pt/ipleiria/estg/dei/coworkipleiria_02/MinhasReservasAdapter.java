@@ -1,5 +1,6 @@
 package pt.ipleiria.estg.dei.coworkipleiria_02;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +14,18 @@ import java.util.List;
 
 public class MinhasReservasAdapter extends RecyclerView.Adapter<MinhasReservasAdapter.ViewHolder> {
 
-    private List<Reserva> reservasList;
+    private final Context context;
+    private final List<Reserva> reservasList;
+    private final OnReservaEditarListener listener;
 
-    public MinhasReservasAdapter(List<Reserva> reservasList) {
+    public interface OnReservaEditarListener {
+        void onEditarReserva(Reserva reserva);
+    }
+
+    public MinhasReservasAdapter(Context context, List<Reserva> reservasList, OnReservaEditarListener listener) {
+        this.context = context;
         this.reservasList = reservasList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -31,7 +40,7 @@ public class MinhasReservasAdapter extends RecyclerView.Adapter<MinhasReservasAd
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Reserva reserva = reservasList.get(position);
 
-        // Preenche os textos
+        // Preenche os textos pra ver reserva
         holder.tvResumo.setText(reserva.getSala().getNome() + " - " + reserva.getData());
         holder.tvDetalhes.setText(
                 reserva.getHoraInicio() + " às " + reserva.getHoraFim() + "\n" +
@@ -41,7 +50,14 @@ public class MinhasReservasAdapter extends RecyclerView.Adapter<MinhasReservasAd
 
         // Botão Emitir Fatura
         holder.btnEmitirFatura.setOnClickListener(v -> {
-            PdfFaturaGenerator.gerarFatura(holder.itemView.getContext(), reserva);
+            PdfFaturaGenerator.gerarFatura(context, reserva);
+        });
+
+        // Botão Editar que chama o listener que tá no fragment
+        holder.btnEditar.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onEditarReserva(reserva);
+            }
         });
     }
 
@@ -52,13 +68,14 @@ public class MinhasReservasAdapter extends RecyclerView.Adapter<MinhasReservasAd
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvResumo, tvDetalhes;
-        Button btnEmitirFatura;
+        Button btnEmitirFatura, btnEditar;
 
-        ViewHolder(View itemView) {
+        ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvResumo = itemView.findViewById(R.id.tvResumo);
             tvDetalhes = itemView.findViewById(R.id.tvDetalhes);
             btnEmitirFatura = itemView.findViewById(R.id.btnEmitirFatura);
+            btnEditar = itemView.findViewById(R.id.btnEditar);
         }
     }
 }

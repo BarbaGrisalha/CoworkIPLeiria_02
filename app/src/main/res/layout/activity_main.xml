@@ -22,7 +22,7 @@
             app:title="Cowork Ipleiria"
             app:titleTextColor="@android:color/white" />
 
-        <!-- Área onde vão aparecer os ecrãs (fragments) -->
+        <!-- Área onde vão aparecer os ecrãs (Chamado de fragments) -->
         <FrameLayout
             android:id="@+id/main_content_container"
             android:layout_width="match_parent"
@@ -30,7 +30,7 @@
 
     </LinearLayout>
 
-    <!-- Menu lateral (Navigation Drawer) -->
+    <!-- Menu lateral -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"

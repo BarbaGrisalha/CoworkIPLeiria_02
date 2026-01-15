@@ -50,32 +50,23 @@ public class LoginFragment extends Fragment {
         return view;
     }
 
-//    @Override
-//    public View onCreateView(@NonNull LayoutInflater inflater,
-//                             @Nullable ViewGroup container,
-//                             @Nullable Bundle savedInstanceState) {
-//        Log.d("LoginFragment", "onCreateView started");
-//        View view = inflater.inflate(R.layout.fragment_login, container, false);
-//        Log.d("LoginFragment", "inflate done");
-//        return view;
-//    }
     private void realizarLogin() {
         String email = etEmail.getText().toString().trim();
         String senha = etSenha.getText().toString().trim();
 
-        // Validação básica
+        // Validação básica de email e senha
         if (email.isEmpty() || senha.isEmpty()) {
             Toast.makeText(getContext(), "Preencha email e senha", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Login normal usando o DAO existente
+        // Login normal usando o userDao
         AppDatabase db = AppDatabase.getDatabase(requireContext());
         UserDao userDao = db.userDao();
         User user = userDao.login(email, senha);
 
         if (user != null) {
-            // Salva sessão
+            // Salva sessão - não esquecer disso.
             SharedPreferences prefs = requireActivity().getSharedPreferences("session", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = prefs.edit();
             editor.putInt("userId", user.id);
@@ -85,10 +76,10 @@ public class LoginFragment extends Fragment {
 
             Toast.makeText(getContext(), "Bem-vindo, " + user.nome + "!", Toast.LENGTH_SHORT).show();
 
-            // Atualiza o header do drawer com os dados do utilizador logado
-            ((MainActivity) requireActivity()).atualizarHeaderUsuario();  // ← ESSA LINHA RESOLVE O BUG
+            // Atualiza o header do drawer com os dados do logado
+            ((MainActivity) requireActivity()).atualizarHeaderUsuario();
 
-            // Navega pra tela principal
+            // Vai pra tela principal
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.main_content_container, new SalasFragment())

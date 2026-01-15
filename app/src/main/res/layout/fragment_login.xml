@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:text="Entrar" />
 
-    <!-- Novo: Link para cadastro -->
+    <!-- Link para cadastro -->
     <TextView
         android:id="@+id/tvCadastrar"
         android:layout_width="wrap_content"

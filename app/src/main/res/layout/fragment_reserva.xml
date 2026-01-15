@@ -94,7 +94,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvHoraFimLabel" />
 
-        <!-- Preço total (atualiza dinamicamente) -->
+        <!-- Preço total que vai atualizando -->
         <TextView
             android:id="@+id/tvPrecoTotal"
             android:layout_width="0dp"
@@ -107,7 +107,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/timePickerFim" />
-        <!-- Botão (agora vai aparecer no final) -->
+        <!-- Botão  -->
         <Button
             android:id="@+id/btnVerificarDisponibilidade"
             android:layout_width="0dp"

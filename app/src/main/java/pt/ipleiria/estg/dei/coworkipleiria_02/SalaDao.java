@@ -4,7 +4,6 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
-import androidx.room.RewriteQueriesToDropUnusedColumns;  // adiciona este import
 
 import pt.ipleiria.estg.dei.coworkipleiria_02.model.Sala;
 
@@ -19,14 +18,13 @@ public interface SalaDao {
     @Update
     void update(Sala sala);
 
-//    @RewriteQueriesToDropUnusedColumns  // ← adiciona isto para o Room ignorar colunas extras
-//    @Query("SELECT * FROM salas WHERE is_active = 1 ORDER BY nome ASC")
-//    List<Sala> getAllActiveSalas();
-//
-//    @RewriteQueriesToDropUnusedColumns  // ← e aqui também
-//    @Query("SELECT * FROM salas WHERE id = :id AND is_active = 1 LIMIT 1")
-//    Sala getSalaById(String id);
-//
-//    @Query("UPDATE salas SET is_active = 0 WHERE id = :id")
-//    int inativar(String id);
+
+    @Query("SELECT * FROM salas WHERE isActive = 1 ORDER BY nome ASC")
+    List<Sala> getAllActiveSalas();
+
+    @Query("SELECT * FROM salas WHERE id = :id AND isActive = 1 LIMIT 1")
+    Sala getSalaById(String id);
+
+    @Query("UPDATE salas SET isActive = 0 WHERE id = :id")
+    int inativar(String id);
 }

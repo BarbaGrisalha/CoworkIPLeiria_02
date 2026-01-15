@@ -10,7 +10,7 @@ public class Converters {
 
     private static final Gson gson = new Gson();
 
-    // Para Date <-> Long (timestamp)
+
     @TypeConverter
     public static Date fromTimestamp(Long value) {
         return value == null ? null : new Date(value);
@@ -21,7 +21,7 @@ public class Converters {
         return date == null ? null : date.getTime();
     }
 
-    // Para Sala_old <-> JSON String
+
     @TypeConverter
     public static String salaToJson(Sala sala) {
         return sala == null ? null : gson.toJson(sala);

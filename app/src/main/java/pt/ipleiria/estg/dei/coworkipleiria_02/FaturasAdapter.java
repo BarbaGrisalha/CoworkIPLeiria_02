@@ -31,14 +31,13 @@ public class FaturasAdapter extends RecyclerView.Adapter<FaturasAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Reserva reserva = reservasList.get(position);
 
-        // Resumo simples: Código da reserva + Sala_old + Data
         String resumo = "Reserva #" + reserva.getId() +
                 " - " + reserva.getSala().getNome() +
                 " - " + reserva.getData();
 
         holder.tvResumo.setText(resumo);
 
-        // Botão Emitir Fatura (reutiliza o gerador que já funciona)
+        // Botão Emitir Fatura
         holder.btnEmitirFatura.setOnClickListener(v -> {
             PdfFaturaGenerator.gerarFatura(holder.itemView.getContext(), reserva);
         });

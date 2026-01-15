@@ -42,7 +42,7 @@ public class PdfFaturaGenerator {
         int y = 40;
         int leftMargin = 40;
 
-        // Cabeçalho - Padrão Portugal
+        // Cabeçalho - Padrão Tuga.
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
         canvas.drawText("FATURA SIMPLIFICADA", leftMargin, y, paint);
@@ -104,14 +104,14 @@ public class PdfFaturaGenerator {
         File file = null;
 
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) { // API 29+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 ContentValues values = new ContentValues();
                 values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
                 values.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf");
                 values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/FaturasCowork");
 
                 uri = context.getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
-            } else { // API < 29
+            } else {
                 File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
                 File subDir = new File(downloadsDir, "FaturasCowork");
                 if (!subDir.exists()) subDir.mkdirs();

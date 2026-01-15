@@ -3,59 +3,80 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
     app:cardCornerRadius="12dp"
-    app:cardElevation="4dp"
-    android:layout_marginBottom="12dp">
+    app:cardElevation="4dp">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:padding="16dp">
 
-        <TextView
-            android:id="@+id/tvNomeSala"
+        <!-- Conteúdo principal -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:text="Sala X" />
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/img_inativar"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvTipoSala"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textColor="#666666"
-            android:text="Tipo: Equipe" />
+            <TextView
+                android:id="@+id/tvNomeSala"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sala X"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/tvCapacidade"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:text="Capacidade: 4 pessoas" />
+            <TextView
+                android:id="@+id/tvTipoSala"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tipo: Equipe"
+                android:textColor="#666666"
+                android:textSize="14sp" />
 
-        <TextView
-            android:id="@+id/tvPreco"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textColor="#2E7D32"
-            android:text="7 € / hora" />
+            <TextView
+                android:id="@+id/tvCapacidade"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Capacidade: 4 pessoas"
+                android:textSize="14sp" />
 
-        <TextView
-            android:id="@+id/tvDisponibilidade"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:paddingVertical="6dp"
-        android:paddingHorizontal="12dp"
-            android:background="@drawable/bg_disponivel"
-            android:text="Disponível"
-            android:textColor="@android:color/white"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tvPreco"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="7 € / hora"
+                android:textColor="#2E7D32"
+                android:textSize="16sp" />
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/tvDisponibilidade"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_disponivel"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
+                android:text="Disponível"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Botão Inativar (lixeira) -->
+        <ImageView
+            android:id="@+id/img_inativar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Inativar sala"
+            android:padding="8dp"
+            android:src="@drawable/excluir"
+            android:tint="#E60505" />
+
+    </RelativeLayout>
 </androidx.cardview.widget.CardView>

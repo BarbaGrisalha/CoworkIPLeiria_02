@@ -19,7 +19,7 @@ public interface ReservaDao {
     @Query("SELECT * FROM reservas WHERE userId = :userId ORDER BY dataReserva DESC")
     List<Reserva> getByUser(int userId);
 
-    // Opcional: se quiser deletar no futuro
+
     @Delete
     void delete(Reserva reserva);
 
