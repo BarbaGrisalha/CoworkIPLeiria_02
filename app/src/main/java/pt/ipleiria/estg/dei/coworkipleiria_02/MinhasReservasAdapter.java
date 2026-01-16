@@ -1,21 +1,31 @@
 package pt.ipleiria.estg.dei.coworkipleiria_02;
 
+
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.Request;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class MinhasReservasAdapter extends RecyclerView.Adapter<MinhasReservasAdapter.ViewHolder> {
 
     private final Context context;
-    private final List<Reserva> reservasList;
+    private List<Reserva> reservasList;
     private final OnReservaEditarListener listener;
 
     public interface OnReservaEditarListener {
@@ -28,32 +38,26 @@ public class MinhasReservasAdapter extends RecyclerView.Adapter<MinhasReservasAd
         this.listener = listener;
     }
 
+    public void atualizarLista(List<Reserva> novaLista) {
+        this.reservasList = novaLista;
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_reserva, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_reserva, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Reserva reserva = reservasList.get(position);
-
-        // Preenche os textos pra ver reserva
         holder.tvResumo.setText(reserva.getSala().getNome() + " - " + reserva.getData());
-        holder.tvDetalhes.setText(
-                reserva.getHoraInicio() + " às " + reserva.getHoraFim() + "\n" +
-                        "Duração: " + reserva.getDuracaoHoras() + "h\n" +
-                        "Total: " + String.format("%.2f €", reserva.getPrecoTotal())
-        );
+        holder.tvDetalhes.setText(reserva.getHoraInicio() + " às " + reserva.getHoraFim() + "\n" + "Duração: " + reserva.getDuracaoHoras() + "h\n" + "Total: " + String.format("%.2f €", reserva.getPrecoTotal()));
 
-        // Botão Emitir Fatura
-        holder.btnEmitirFatura.setOnClickListener(v -> {
-            PdfFaturaGenerator.gerarFatura(context, reserva);
-        });
+        holder.btnEmitirFatura.setOnClickListener(v -> PdfFaturaGenerator.gerarFatura(context, reserva));
 
-        // Botão Editar que chama o listener que tá no fragment
         holder.btnEditar.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onEditarReserva(reserva);
@@ -78,4 +82,6 @@ public class MinhasReservasAdapter extends RecyclerView.Adapter<MinhasReservasAd
             btnEditar = itemView.findViewById(R.id.btnEditar);
         }
     }
+
+
 }

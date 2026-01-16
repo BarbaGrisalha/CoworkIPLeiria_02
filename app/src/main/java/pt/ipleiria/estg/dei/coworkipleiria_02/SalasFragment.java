@@ -53,4 +53,11 @@ public class SalasFragment extends Fragment {
 
         return view;
     }
+    public static ReservaFragment newInstance(Sala sala) {
+        ReservaFragment fragment = new ReservaFragment();
+        Bundle args = new Bundle();
+        args.putSerializable("sala", sala);  // ou putParcelable se Sala for Parcelable
+        fragment.setArguments(args);
+        return fragment;
+    }
 }

@@ -18,6 +18,9 @@ import java.util.Date;
 
 import pt.ipleiria.estg.dei.coworkipleiria_02.model.Sala;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 public class PagamentoFragment extends Fragment {
 
     private static final String ARG_TOTAL = "total";
@@ -104,9 +107,10 @@ public class PagamentoFragment extends Fragment {
                     duracaoHoras,
                     total
             );
-
-
-            novaReserva.setDataReserva(new Date());
+//Formato ISO YYYY-MM-DD
+            String dataAtual = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
+            //novaReserva.setDataReserva(new Date());
+            novaReserva.setDataReserva(dataAtual);
             novaReserva.setStatus("Paga");
 
             // Pega o userId da sessão atual
