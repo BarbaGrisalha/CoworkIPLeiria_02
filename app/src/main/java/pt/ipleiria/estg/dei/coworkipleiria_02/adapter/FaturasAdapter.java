@@ -1,4 +1,4 @@
-package pt.ipleiria.estg.dei.coworkipleiria_02;
+package pt.ipleiria.estg.dei.coworkipleiria_02.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +11,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+import pt.ipleiria.estg.dei.coworkipleiria_02.PdfFaturaGenerator;
+import pt.ipleiria.estg.dei.coworkipleiria_02.R;
+import pt.ipleiria.estg.dei.coworkipleiria_02.model.Reserva;
+
 public class FaturasAdapter extends RecyclerView.Adapter<FaturasAdapter.ViewHolder> {
 
     private List<Reserva> reservasList;
@@ -19,11 +23,16 @@ public class FaturasAdapter extends RecyclerView.Adapter<FaturasAdapter.ViewHold
         this.reservasList = reservasList;
     }
 
+
+    public void atualizarLista(List<Reserva> novaLista) {
+        this.reservasList = novaLista;
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_fatura, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_fatura, parent, false);
         return new ViewHolder(view);
     }
 
@@ -31,10 +40,8 @@ public class FaturasAdapter extends RecyclerView.Adapter<FaturasAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Reserva reserva = reservasList.get(position);
 
-        String resumo = "Reserva #" + reserva.getId() +
-                " - " + reserva.getSala().getNome() +
-                " - " + reserva.getData();
-
+        // Resumo (ajuste conforme seu item_fatura.xml)
+        String resumo = "Fatura #" + reserva.getId() + " - Sala " + reserva.getSalaId() + " - " + reserva.getData();
         holder.tvResumo.setText(resumo);
 
         // Botão Emitir Fatura
@@ -45,7 +52,7 @@ public class FaturasAdapter extends RecyclerView.Adapter<FaturasAdapter.ViewHold
 
     @Override
     public int getItemCount() {
-        return reservasList.size();
+        return reservasList != null ? reservasList.size() : 0;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

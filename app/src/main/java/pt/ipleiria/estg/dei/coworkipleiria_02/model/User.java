@@ -1,14 +1,14 @@
-package pt.ipleiria.estg.dei.coworkipleiria_02;
+package pt.ipleiria.estg.dei.coworkipleiria_02.model;
 
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import androidx.room.ColumnInfo;
 
-@Entity(tableName = "users")  // Nome da tabela no banco
+@Entity(tableName = "users")
 public class User {
 
-    @PrimaryKey(autoGenerate = true)  // ID auto-incremento
+    @PrimaryKey(autoGenerate = true)
     public int id;
 
     @ColumnInfo(name = "email")

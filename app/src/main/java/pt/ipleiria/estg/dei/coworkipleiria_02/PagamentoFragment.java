@@ -1,6 +1,7 @@
 package pt.ipleiria.estg.dei.coworkipleiria_02;
 
-import android.content.Context;
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,12 +15,18 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
-import java.util.Date;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import pt.ipleiria.estg.dei.coworkipleiria_02.model.Sala;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 public class PagamentoFragment extends Fragment {
 
@@ -27,16 +34,20 @@ public class PagamentoFragment extends Fragment {
     private static final String ARG_DATA = "data";
     private static final String ARG_HORA_INICIO = "hora_inicio";
     private static final String ARG_HORA_FIM = "hora_fim";
+    private static final String ARG_SALA = "sala";
+    private static final String ARG_TIPO_RESERVA = "tipo_reserva";
+    private static final String ARG_RESERVATION_ID = "reservation_id";
 
     private double total;
     private String data, horaInicio, horaFim;
+    private String tipoReserva;
+    private Sala sala;
+    private long reservaId = -1;  // Inicializa com -1 (inválido)
 
     private EditText etNumeroCartao, etValidade, etCvv;
     private Button btnPagar;
-    private static final String ARG_SALA = "sala";
-    private Sala sala;
 
-    public static PagamentoFragment newInstance(double total, String data, String horaInicio, String horaFim, Sala sala) {
+    public static PagamentoFragment newInstance(double total, String data, String horaInicio, String horaFim, Sala sala, String tipoReserva, long reservationId) {
         PagamentoFragment fragment = new PagamentoFragment();
         Bundle args = new Bundle();
         args.putDouble(ARG_TOTAL, total);
@@ -44,15 +55,15 @@ public class PagamentoFragment extends Fragment {
         args.putString(ARG_HORA_INICIO, horaInicio);
         args.putString(ARG_HORA_FIM, horaFim);
         args.putSerializable(ARG_SALA, sala);
+        args.putString(ARG_TIPO_RESERVA, tipoReserva);
+        args.putLong(ARG_RESERVATION_ID, reservationId);  // Passa o ID da reserva
         fragment.setArguments(args);
         return fragment;
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_pagamento, container, false);
-
 
         TextView tvDetalhes = view.findViewById(R.id.tvDetalhesReserva);
         etNumeroCartao = view.findViewById(R.id.etNumeroCartao);
@@ -66,10 +77,15 @@ public class PagamentoFragment extends Fragment {
             horaInicio = getArguments().getString(ARG_HORA_INICIO, "");
             horaFim = getArguments().getString(ARG_HORA_FIM, "");
             sala = (Sala) getArguments().getSerializable(ARG_SALA);
+            tipoReserva = getArguments().getString(ARG_TIPO_RESERVA, "hora");
+            reservaId = getArguments().getLong(ARG_RESERVATION_ID, -1);  // Recupera ID
+            Log.d("PAGAMENTO", "ID recebido: " + reservaId);
 
             tvDetalhes.setText("Reserva para " + data + "\n" +
                     "Horário: " + horaInicio + " às " + horaFim + "\n" +
+                    "Tipo: " + tipoReserva + "\n" +
                     "Total: " + String.format("%.2f €", total));
+
             btnPagar.setText("Pagar " + String.format("%.2f €", total));
         }
 
@@ -88,69 +104,87 @@ public class PagamentoFragment extends Fragment {
             return;
         }
 
-        if (numero.equals("4111111111111111")) {  // cartão VisaFake
-
+        if (numero.equals("4111111111111111")) {
             int duracaoHoras;
             try {
                 duracaoHoras = Integer.parseInt(horaFim.split(":")[0]) - Integer.parseInt(horaInicio.split(":")[0]);
+                if (duracaoHoras <= 0) duracaoHoras = 1;
             } catch (Exception e) {
                 Toast.makeText(getContext(), "Erro ao calcular duração", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // Cria a reserva
-            Reserva novaReserva = new Reserva(
-                    sala,
-                    data,
-                    horaInicio,
-                    horaFim,
-                    duracaoHoras,
-                    total
-            );
-//Formato ISO YYYY-MM-DD
-            String dataAtual = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
-            //novaReserva.setDataReserva(new Date());
-            novaReserva.setDataReserva(dataAtual);
-            novaReserva.setStatus("Paga");
+            Toast.makeText(getContext(), "Pagamento aprovado! Atualizando status...", Toast.LENGTH_SHORT).show();
 
-            // Pega o userId da sessão atual
-            SharedPreferences prefs = requireActivity().getSharedPreferences("session", Context.MODE_PRIVATE);
-            int userId = prefs.getInt("userId", -1);
+            // Atualiza em background
+            new Thread(() -> atualizarStatusPagamento(reservaId)).start();
 
-            if (userId == -1) {
-                Toast.makeText(getContext(), "Erro: Nenhum usuário logado. Faça login novamente.", Toast.LENGTH_LONG).show();
-
-                requireActivity().getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.main_content_container, new LoginFragment())
-                        .commit();
-                return;
-            }
-
-            novaReserva.setUserId(userId);
-
-
-            try {
-                AppDatabase db = AppDatabase.getDatabase(requireContext());
-                db.reservaDao().insert(novaReserva);
-
-                Toast.makeText(getContext(),
-                        "Pagamento aprovado!\n" +
-                                "Reserva confirmada com sucesso!\n" +
-                                "Valor: " + String.format("%.2f €", total) +
-                                "\nSalva em Minhas Reservas!",
-                        Toast.LENGTH_LONG).show();
-
-
-                requireActivity().getSupportFragmentManager().popBackStack();
-
-            } catch (Exception e) {
-                Toast.makeText(getContext(), "Erro ao salvar a reserva no banco: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                Log.e("PagamentoFragment", "Erro ao inserir reserva", e);
-            }
-
+            requireActivity().getSupportFragmentManager().popBackStack();
         } else {
-            Toast.makeText(getContext(), "Cartão inválido. Use o teste: 4111 1111 1111 1111", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Cartão inválido. Use teste: 4111111111111111", Toast.LENGTH_LONG).show();
         }
+    }
+    private void atualizarStatusPagamento(long reservaId) {
+        if (reservaId == -1) {
+            Log.e("PAGAMENTO", "ID da reserva inválido");
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(() -> {
+                    Toast.makeText(getContext(), "Erro: ID da reserva não recebido", Toast.LENGTH_SHORT).show();
+                });
+            }
+            return;
+        }
+
+        String url = "http://10.0.2.2:8080/cowork/api/web/reservation/" + reservaId;
+
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("status", "pago");
+        } catch (JSONException e) {
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(() -> {
+                    Toast.makeText(getContext(), "Erro ao preparar status", Toast.LENGTH_SHORT).show();
+                });
+            }
+            return;
+        }
+
+        // Cria queue fora da thread (mais seguro)
+        RequestQueue queue = Volley.newRequestQueue(requireContext());
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.PUT, url, jsonBody,
+                response -> {
+                    Log.d("PAGAMENTO_UPDATE", "Status atualizado: " + response.toString());
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            Toast.makeText(getContext(), "Reserva paga e confirmada!", Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                },
+                error -> {
+                    String body = error.networkResponse != null ? new String(error.networkResponse.data) : "Sem resposta";
+                    int status = error.networkResponse != null ? error.networkResponse.statusCode : 0;
+                    Log.e("PAGAMENTO_UPDATE_ERRO", "Status: " + status + " | Body: " + body);
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            Toast.makeText(getContext(), "Erro ao confirmar pagamento: " + status, Toast.LENGTH_LONG).show();
+                        });
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                SharedPreferences prefs = requireContext().getSharedPreferences("user", MODE_PRIVATE);
+                String token = prefs.getString("auth_token", null);
+                if (token != null && !token.isEmpty()) {
+                    headers.put("Authorization", "Bearer " + token);
+                }
+                return headers;
+            }
+        };
+
+        // Adiciona na queue (já criada fora da thread)
+        queue.add(request);
     }
 }

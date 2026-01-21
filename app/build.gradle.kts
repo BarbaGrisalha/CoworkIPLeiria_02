@@ -47,6 +47,7 @@ dependencies {
 
     // Room - Banco de dados local (SQLite) - ESSENCIAL
     implementation("androidx.room:room-runtime:2.6.1")
+    implementation(libs.navigation.runtime)
     annotationProcessor("androidx.room:room-compiler:2.6.1")  // <--- ESTA LINHA RESOLVE O ERRO
 
     // Opcional: suporte moderno (LiveData/Flow) - pode remover se não usar

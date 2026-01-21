@@ -1,6 +1,7 @@
 package pt.ipleiria.estg.dei.coworkipleiria_02;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,13 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+
+import com.android.volley.Request;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class CadastroFragment extends Fragment {
 
@@ -46,23 +54,50 @@ public class CadastroFragment extends Fragment {
             return;
         }
 
-        AppDatabase db = AppDatabase.getDatabase(requireContext());
-        UserDao userDao = db.userDao();
-
-        if (userDao.getByEmail(email) != null) {
-            Toast.makeText(getContext(), "Email já cadastrado", Toast.LENGTH_SHORT).show();
+        // JSON para POST no backend
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("nome", nome);
+            jsonBody.put("email", email);
+            jsonBody.put("password", senha);
+            jsonBody.put("password_confirmation", confirmarSenha);
+            // Adicione outros campos se o backend exigir (ex.: username, nif, etc.)
+        } catch (JSONException e) {
+            Toast.makeText(getContext(), "Erro ao preparar dados", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        User novoUser = new User(email, senha, nome);
-        userDao.insert(novoUser);
+        String url = "http://10.0.2.2:8080/cowork/api/web/auth/register";  // Ajuste o endpoint de cadastro real
 
-        Toast.makeText(getContext(), "Cadastro realizado com sucesso! Faça login.", Toast.LENGTH_SHORT).show();
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonBody,
+                response -> {
+                    Log.d("CADASTRO_OK", response.toString());
+                    boolean success = response.optBoolean("success", false);
 
-        // Volta pra LoginFragment
-        requireActivity().getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.main_content_container, new LoginFragment())
-                .commit();
+                    if (success) {
+                        Toast.makeText(getContext(), "Cadastro realizado com sucesso! Faça login.", Toast.LENGTH_LONG).show();
+
+                        // Navega para login
+                        requireActivity().getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.main_content_container, new LoginFragment())
+                                .addToBackStack(null)
+                                .commit();
+                    } else {
+                        Toast.makeText(getContext(), response.optString("message", "Erro no cadastro"), Toast.LENGTH_LONG).show();
+                    }
+                },
+                error -> {
+                    Log.e("CADASTRO_ERRO", error.toString());
+                    String msg = "Falha no cadastro";
+                    if (error.networkResponse != null) {
+                        String body = new String(error.networkResponse.data);
+                        Log.e("CADASTRO_BODY", body);
+                        msg += " - " + error.networkResponse.statusCode + ": " + body;
+                    }
+                    Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
+                });
+
+        Volley.newRequestQueue(requireContext()).add(request);
     }
 }

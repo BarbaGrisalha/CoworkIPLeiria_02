@@ -1,8 +1,8 @@
 package pt.ipleiria.estg.dei.coworkipleiria_02;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -15,6 +15,8 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
+
+import pt.ipleiria.estg.dei.coworkipleiria_02.model.User;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -85,21 +87,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             carregarFragment(new MinhasReservasFragment());
         } else if (id == R.id.nav_faturas) {
             carregarFragment(new EmitirFaturasFragment());
+        } else if (id == R.id.nav_edit_profile) {
+            startActivity(new Intent(MainActivity.this, EditProfileActivity.class));
         } else if (id == R.id.nav_logout) {
             // Logout: limpa sessão
-            SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
+            SharedPreferences prefs = getSharedPreferences("user", MODE_PRIVATE);
             prefs.edit().clear().apply();
-
             Toast.makeText(this, "Sessão encerrada. Até breve!", Toast.LENGTH_SHORT).show();
-
             carregarFragment(new LoginFragment());
 
-
+            // Recarrega o navigationView para marcar o item correto
             NavigationView navigationView = findViewById(R.id.nav_view);
             navigationView.setCheckedItem(R.id.nav_salas);
-
         }
-
 
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
@@ -130,25 +130,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void atualizarHeaderUsuario() {
         NavigationView navigationView = findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
-
         TextView tvNome = headerView.findViewById(R.id.tv_header_nome);
         TextView tvEmail = headerView.findViewById(R.id.tv_header_email);
 
-        SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
-        int userId = prefs.getInt("userId", -1);
+        SharedPreferences prefs = getSharedPreferences("user", MODE_PRIVATE);
+        int userId = prefs.getInt("user_id", -1);  // chave correta do login
+        String nome = prefs.getString("nome", "Não logado");
+        String email = prefs.getString("email", "");  // se salvar email no login
 
         if (userId != -1) {
-            // Carrega o usuário da BD
-            UserDao userDao = AppDatabase.getDatabase(this).userDao();
-            User user = userDao.getUserById(userId);
-
-            if (user != null) {
-                tvNome.setText(user.getNome());
-                tvEmail.setText(user.getEmail());
-            } else {
-                tvNome.setText("Utilizador não encontrado");
-                tvEmail.setText("");
-            }
+            tvNome.setText(nome);
+            tvEmail.setText(email);
         } else {
             tvNome.setText("Não logado");
             tvEmail.setText("");

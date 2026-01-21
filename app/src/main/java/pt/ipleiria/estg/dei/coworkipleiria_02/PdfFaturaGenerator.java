@@ -26,11 +26,21 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import pt.ipleiria.estg.dei.coworkipleiria_02.model.Reserva;
+
 public class PdfFaturaGenerator {
 
     public static void gerarFatura(Context context, Reserva reserva) {
+        if (reserva == null) {
+            Toast.makeText(context, "Reserva inválida", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        String fileName = "Fatura_Cowork_" + reserva.getSala().getNome().replace(" ", "_") + "_" + timeStamp + ".pdf";
+
+        // Nome da sala baseado em salaId (fallback seguro)
+        String salaNome = reserva.getSalaId() != null ? "Sala_" + reserva.getSalaId() : "Sala_Desconhecida";
+        String fileName = "Fatura_Cowork_" + salaNome.replace(" ", "_") + "_" + timeStamp + ".pdf";
 
         PdfDocument document = new PdfDocument();
         PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(595, 842, 1).create();
@@ -42,7 +52,7 @@ public class PdfFaturaGenerator {
         int y = 40;
         int leftMargin = 40;
 
-        // Cabeçalho - Padrão Tuga.
+        // Cabeçalho
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
         canvas.drawText("FATURA SIMPLIFICADA", leftMargin, y, paint);
@@ -76,8 +86,11 @@ public class PdfFaturaGenerator {
         // Detalhes reserva
         canvas.drawText("Descrição:", leftMargin, y, paint);
         y += 20;
-        canvas.drawText("Sala_old: " + reserva.getSala().getNome() + " (" + reserva.getSala().getTipo().name().replace("_", " ") + ")", leftMargin, y, paint);
+
+        // Correção: usa salaId em vez de getSala()
+        canvas.drawText("Sala: " + salaNome + " (ID: " + reserva.getSalaId() + ")", leftMargin, y, paint);
         y += 20;
+
         canvas.drawText("Data: " + reserva.getData(), leftMargin, y, paint);
         y += 20;
         canvas.drawText("Horário: " + reserva.getHoraInicio() + " às " + reserva.getHoraFim(), leftMargin, y, paint);
@@ -109,14 +122,12 @@ public class PdfFaturaGenerator {
                 values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
                 values.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf");
                 values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/FaturasCowork");
-
                 uri = context.getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
             } else {
                 File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
                 File subDir = new File(downloadsDir, "FaturasCowork");
                 if (!subDir.exists()) subDir.mkdirs();
                 file = new File(subDir, fileName);
-
                 FileOutputStream fos = new FileOutputStream(file);
                 document.writeTo(fos);
                 fos.close();
@@ -129,7 +140,6 @@ public class PdfFaturaGenerator {
                     document.writeTo(outputStream);
                     outputStream.close();
                 }
-
                 Toast.makeText(context, "Fatura salva em Downloads/FaturasCowork: " + fileName, Toast.LENGTH_LONG).show();
 
                 // Abrir o PDF

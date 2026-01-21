@@ -18,6 +18,10 @@
             android:id="@+id/nav_faturas"
             android:icon="@android:drawable/ic_menu_send"
             android:title="Emitir Fatura" />
+        <item
+            android:id="@+id/nav_edit_profile"
+            android:icon="@drawable/chageinfo"
+        android:title="Atualizar Utilizador" />
 
         <item
             android:id="@+id/nav_logout"

@@ -16,7 +16,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.CoworkIPLeiria_02">
+        android:theme="@style/Theme.CoworkIPLeiria_02"
+        android:usesCleartextTraffic="true">
 
         <!-- Activities – todas no mesmo nível, DENTRO de <application> -->
         <activity
@@ -32,10 +33,10 @@
             android:name=".ConfigActivity"
             android:exported="false" />
 
-        <!-- Remove duplicata – se tens outra activity chamada activity_config (minúscula), corrige o nome para .ConfigActivity -->
-        <!-- <activity android:name=".activity_config" android:exported="false" /> -->
-
-        <!-- Adiciona aqui outras activities se tiveres (ex.: ReservaActivity, etc.) -->
+        <activity
+            android:name=".EditProfileActivity"
+            android:exported="false"
+        android:theme="@style/Theme.CoworkIPLeiria_02" />
 
     </application>
 

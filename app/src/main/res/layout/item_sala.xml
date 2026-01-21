@@ -3,80 +3,78 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
     app:cardCornerRadius="12dp"
-    app:cardElevation="4dp">
+    app:cardElevation="4dp"
+    android:layout_margin="8dp">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:orientation="vertical"
+        android:padding="12dp">
 
-        <!-- Conteúdo principal -->
+        <!-- Imagem (mantida, mas pode remover se não quiseres) -->
+        <ImageView
+            android:id="@+id/img_sala"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:scaleType="centerCrop"
+            android:src="@android:drawable/ic_menu_gallery" />
+
+        <!-- Nome da sala -->
+        <TextView
+            android:id="@+id/tv_nome_sala"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:paddingTop="12dp"
+            android:text="Sala de Reunião Beta" />
+
+        <!-- Capacidade -->
+        <TextView
+            android:id="@+id/tv_capacidade"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="#555555"
+            android:paddingTop="4dp"
+            android:text="Até 6 pessoas" />
+
+        <!-- Botões VERTICAIS (um em cima do outro) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_toLeftOf="@+id/img_inativar"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingTop="16dp">
 
-            <TextView
-                android:id="@+id/tvNomeSala"
+            <Button
+                android:id="@+id/btn_por_hora"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Sala X"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:text="Por Hora"
+                android:backgroundTint="#2196F3"
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="8dp" />
 
-            <TextView
-                android:id="@+id/tvTipoSala"
+            <Button
+                android:id="@+id/btn_diaria"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Tipo: Equipe"
-                android:textColor="#666666"
-                android:textSize="14sp" />
+                android:text="Diária R$ 32"
+                android:backgroundTint="#4CAF50"
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="8dp" />
 
-            <TextView
-                android:id="@+id/tvCapacidade"
+            <Button
+                android:id="@+id/btn_mensal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Capacidade: 4 pessoas"
-                android:textSize="14sp" />
-
-            <TextView
-                android:id="@+id/tvPreco"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="7 € / hora"
-                android:textColor="#2E7D32"
-                android:textSize="16sp" />
-
-            <TextView
-                android:id="@+id/tvDisponibilidade"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/bg_disponivel"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="6dp"
-                android:text="Disponível"
-                android:textColor="@android:color/white"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:text="Mensal R$ 225"
+                android:backgroundTint="#FF9800"
+                android:textColor="#FFFFFF" />
         </LinearLayout>
 
-        <!-- Botão Inativar (lixeira) -->
-        <ImageView
-            android:id="@+id/img_inativar"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Inativar sala"
-            android:padding="8dp"
-            android:src="@drawable/excluir"
-            android:tint="#E60505" />
-
-    </RelativeLayout>
+    </LinearLayout>
 </androidx.cardview.widget.CardView>

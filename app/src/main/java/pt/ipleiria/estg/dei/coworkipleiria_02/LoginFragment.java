@@ -1,5 +1,7 @@
 package pt.ipleiria.estg.dei.coworkipleiria_02;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -16,17 +18,30 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.navigation.NavigationView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginFragment extends Fragment {
 
     private EditText etEmail, etSenha;
     private Button btnLogin;
+    private RequestQueue requestQueue;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
+        requestQueue = Volley.newRequestQueue(getContext());
 
         // Inicializa views
         etEmail = view.findViewById(R.id.etEmail);
@@ -36,8 +51,8 @@ public class LoginFragment extends Fragment {
         // Botão de login
         btnLogin.setOnClickListener(v -> realizarLogin());
 
-        // Novo: Listener para o texto de cadastro
-        TextView tvCadastrar = view.findViewById(R.id.tvCadastrar);  // Adicione isso no layout
+
+        TextView tvCadastrar = view.findViewById(R.id.tvCadastrar);
         tvCadastrar.setOnClickListener(v -> {
             // Navega para CadastroFragment
             requireActivity().getSupportFragmentManager()
@@ -50,45 +65,98 @@ public class LoginFragment extends Fragment {
         return view;
     }
 
-    private void realizarLogin() {
-        String email = etEmail.getText().toString().trim();
-        String senha = etSenha.getText().toString().trim();
+    String url = "http://10.0.2.2:8080/cowork/api/web/auth/login";
 
-        // Validação básica de email e senha
-        if (email.isEmpty() || senha.isEmpty()) {
-            Toast.makeText(getContext(), "Preencha email e senha", Toast.LENGTH_SHORT).show();
+    // ... imports e onCreateView iguais ...
+
+    private void realizarLogin() {
+        String username = etEmail.getText().toString().trim();
+        String password = etSenha.getText().toString().trim();
+
+        if (username.isEmpty() || password.isEmpty()) {
+            Toast.makeText(getContext(), "Preencha username e senha", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Login normal usando o userDao
-        AppDatabase db = AppDatabase.getDatabase(requireContext());
-        UserDao userDao = db.userDao();
-        User user = userDao.login(email, senha);
-
-        if (user != null) {
-            // Salva sessão - não esquecer disso.
-            SharedPreferences prefs = requireActivity().getSharedPreferences("session", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putInt("userId", user.id);
-            editor.putString("userEmail", user.email);
-            editor.putString("userNome", user.nome);
-            editor.apply();
-
-            Toast.makeText(getContext(), "Bem-vindo, " + user.nome + "!", Toast.LENGTH_SHORT).show();
-
-            // Atualiza o header do drawer com os dados do logado
-            ((MainActivity) requireActivity()).atualizarHeaderUsuario();
-
-            // Vai pra tela principal
-            requireActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.main_content_container, new SalasFragment())
-                    .commit();
-
-            NavigationView navigationView = requireActivity().findViewById(R.id.nav_view);
-            navigationView.setCheckedItem(R.id.nav_salas);
-        } else {
-            Toast.makeText(getContext(), "Credenciais inválidas", Toast.LENGTH_SHORT).show();
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("username", username);
+            jsonBody.put("password", password);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Toast.makeText(getContext(), "Erro ao preparar dados", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.POST,
+                url,
+                jsonBody,
+                response -> {
+                    Log.d("LOGIN_OK", response.toString());
+
+                    boolean success = response.optBoolean("success", false);
+
+                    if (success) {
+                        JSONObject user = response.optJSONObject("user");
+                        String token = response.optString("token", null);
+
+                        // Declara prefs e editor AQUI, dentro do success
+                        SharedPreferences prefs = getContext().getSharedPreferences("user", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();  // ← aqui está o editor
+
+                        if (user != null) {
+                            int userId = user.optInt("id", -1);
+                            String nome = user.optString("nome", "Usuário");
+                            int customerId = user.optInt("customer_id", -1);
+
+                            editor.putInt("user_id", userId);
+                            editor.putInt("customer_id", customerId);
+                            editor.putString("nome", nome);
+
+                            if (token != null && !token.isEmpty()) {
+                                editor.putString("auth_token", token);
+                                Log.d("LOGIN_TOKEN", "Token salvo: " + token);
+                            } else {
+                                Log.w("LOGIN_TOKEN", "Nenhum token retornado pelo backend");
+                            }
+
+                            editor.apply();  // aplica as alterações
+
+                            Log.d("USER_ID_SALVO", "User ID: " + userId + " | Customer ID: " + customerId);
+                            Toast.makeText(getContext(), "Bem-vindo, " + nome + "!", Toast.LENGTH_SHORT).show();
+
+                            // Navega para SalasFragment
+                            requireActivity().getSupportFragmentManager()
+                                    .beginTransaction()
+                                    .replace(R.id.main_content_container, new SalasFragment())
+                                    .addToBackStack(null)
+                                    .commit();
+                        } else {
+                            Toast.makeText(getContext(), "Dados do usuário não encontrados", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "Login falhou", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                error -> {
+                    Log.e("LOGIN_ERRO", error.toString());
+                    if (error.networkResponse != null) {
+                        Log.e("STATUS", String.valueOf(error.networkResponse.statusCode));
+                        Log.e("BODY", new String(error.networkResponse.data));
+                    }
+                    Toast.makeText(getContext(), "Falha na conexão ou credenciais inválidas", Toast.LENGTH_SHORT).show();
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json; charset=utf-8");
+                headers.put("Accept", "application/json");
+                return headers;
+            }
+        };
+
+        requestQueue.add(request);
     }
 }

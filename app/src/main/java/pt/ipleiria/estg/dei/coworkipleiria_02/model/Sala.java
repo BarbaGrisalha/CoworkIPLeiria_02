@@ -1,81 +1,32 @@
 package pt.ipleiria.estg.dei.coworkipleiria_02.model;
 
-import androidx.annotation.NonNull;
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.PrimaryKey;
-
 import java.io.Serializable;
 
-
-@Entity(tableName = "salas")
-public class Sala implements Serializable{
-    @PrimaryKey
-    @NonNull
-    private String id;
-    @ColumnInfo(name = "nome")
-    private String nome;
-    @ColumnInfo(name = "capacidade")
+public class Sala implements Serializable {
+    private int id;
+    private String nome_sala;
     private int capacidade;
-    @ColumnInfo(name = "tipo")
-    private TipoSala tipo;
-    @ColumnInfo(name = "disponivel")
-    private boolean disponivel;
-    @ColumnInfo(name = "precoPorHora")
-    private Double precoPorHora;
-    @ColumnInfo(name = "isActive")
-    private boolean isActive;
+    private String descricao;
+    private int pricing_plan_id;
+    private String status;
 
-    public Sala(String id, String nome, int capacidade, TipoSala tipo, boolean disponivel,
-                Double precoPorHora, boolean isActive) {
-        this.id = id;
-        this.nome = nome;
-        this.capacidade = capacidade;
-        this.tipo = tipo;
-        this.disponivel = disponivel;
-        this.precoPorHora = precoPorHora;
-        this.isActive = isActive;
-    }
+    public Sala() {}
 
-    public boolean isActive() {
-        return isActive;
-    }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public void setActive(boolean active) {
-        isActive = active;
-    }
+    public String getNomeSala() { return nome_sala; }
+    public void setNomeSala(String nome_sala) { this.nome_sala = nome_sala; }
 
-    // Getters
-    public String getId() {
-        return id;
-    }
+    public int getCapacidade() { return capacidade; }
+    public void setCapacidade(int capacidade) { this.capacidade = capacidade; }
 
-    public String getNome() {
-        return nome;
-    }
+    public String getDescricao() { return descricao; }
+    public void setDescricao(String descricao) { this.descricao = descricao; }
 
-    public int getCapacidade() {
-        return capacidade;
-    }
+    public int getPricingPlanId() { return pricing_plan_id; }
+    public void setPricingPlanId(int pricing_plan_id) { this.pricing_plan_id = pricing_plan_id; }
 
-    public TipoSala getTipo() {
-        return tipo;
-    }
-
-    public boolean isDisponivel() {
-        return disponivel;
-    }
-
-    public Double getPrecoPorHora() {
-        return precoPorHora;
-    }
-
-    public enum TipoSala {
-        INDIVIDUAL,
-        EQUIPE_PEQUENA,
-        EQUIPE_MEDIA,
-        REUNIAO
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }
-
-

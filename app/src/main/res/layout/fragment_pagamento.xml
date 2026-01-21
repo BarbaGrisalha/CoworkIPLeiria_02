@@ -31,7 +31,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:hint="Número do Cartão (teste: 4111 1111 1111 1111)"
+            android:hint="Use Card 4111 1111 1111 1111)"
             android:inputType="number" />
 
         <LinearLayout
